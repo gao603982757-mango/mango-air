@@ -6136,11 +6136,11 @@ Games.register({
 (function (global) {
   'use strict';
 
-  /* 用户提供的 API Key（预填）。说明：默认通道为火山方舟（Volcengine
-   * Ark）豆包（Doubao）免费模型 doubao-seed-2-1-pro-260915，每月免费
-   * 额度内零成本、回答简短以节省 Token；未开通模型或请求失败时自动
-   * 降级到本地知识库客服，对话不中断。在设置页可替换为您自己的 Key。 */
-  var PRESET_API_KEY = 'ark-57967c0a-cdd5-460a-a04f-6d9d0f5a05b2-33724';
+  /* 无 Key 版：默认不预填任何 API Key，客服纯走本地知识库兜底，
+   * 不向任何第三方发送数据。如需在线 AI 通道，可在「设置 → 官方客服」
+   * 中粘贴您自己的火山方舟（Volcengine Ark）豆包（Doubao）等
+   * OpenAI 兼容 Key，保存后即时启用；连接失败仍自动降级本地客服。 */
+  var PRESET_API_KEY = '';
 
   var LANGS = ['zh', 'en', 'es', 'fr', 'de', 'ja', 'ko', 'ru'];
   var CFG_KEY = 'cs_cfg';          // → mango_cs_cfg
@@ -6153,10 +6153,10 @@ Games.register({
    * 免费模型 + 低 max_tokens + 关闭深度思考 + 精简系统提示：
    * 最大限度节省 Token。 */
   var DEFAULT_CFG = {
-    enabled: true,
+    enabled: false,
     endpoint: 'https://ark.cn-beijing.volces.com/api/v3',
     model: 'doubao-seed-2-1-pro-260915',
-    apiKey: PRESET_API_KEY,
+    apiKey: '',
   };
 
   function loadCfg() {
