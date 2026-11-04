@@ -1,0 +1,22 @@
+[
+  {"flight_no": "MG101", "airline": "芒果航空", "from_city": "北京", "to_city": "上海", "date": "2026-11-10", "depart": "08:00", "arrive": "10:20", "price": 980, "duration_min": 140, "status": "准点"},
+  {"flight_no": "MG102", "airline": "芒果航空", "from_city": "上海", "to_city": "北京", "date": "2026-11-10", "depart": "19:30", "arrive": "21:55", "price": 1020, "duration_min": 145, "status": "准点"},
+  {"flight_no": "MG203", "airline": "芒果航空", "from_city": "北京", "to_city": "广州", "date": "2026-11-10", "depart": "09:15", "arrive": "12:40", "price": 1280, "duration_min": 205, "status": "准点"},
+  {"flight_no": "MG305", "airline": "芒果航空", "from_city": "广州", "to_city": "三亚", "date": "2026-11-10", "depart": "13:10", "arrive": "14:35", "price": 760, "duration_min": 85, "status": "准点"},
+  {"flight_no": "MG307", "airline": "芒果航空", "from_city": "三亚", "to_city": "广州", "date": "2026-11-10", "depart": "15:50", "arrive": "17:20", "price": 780, "duration_min": 90, "status": "延误"},
+  {"flight_no": "MG401", "airline": "芒果航空", "from_city": "成都", "to_city": "昆明", "date": "2026-11-10", "depart": "07:40", "arrive": "09:25", "price": 690, "duration_min": 105, "status": "准点"},
+  {"flight_no": "MG403", "airline": "芒果航空", "from_city": "昆明", "to_city": "西安", "date": "2026-11-10", "depart": "11:00", "arrive": "13:10", "price": 880, "duration_min": 130, "status": "准点"},
+  {"flight_no": "MG505", "airline": "芒果航空", "from_city": "西安", "to_city": "杭州", "date": "2026-11-10", "depart": "14:20", "arrive": "16:30", "price": 950, "duration_min": 130, "status": "准点"},
+  {"flight_no": "MG507", "airline": "芒果航空", "from_city": "杭州", "to_city": "北京", "date": "2026-11-10", "depart": "18:00", "arrive": "20:10", "price": 1120, "duration_min": 130, "status": "准点"},
+  {"flight_no": "MG601", "airline": "芒果航空", "from_city": "北京", "to_city": "成都", "date": "2026-11-10", "depart": "10:30", "arrive": "13:15", "price": 1150, "duration_min": 165, "status": "准点"},
+  {"flight_no": "MG209", "airline": "芒果航空", "from_city": "上海", "to_city": "广州", "date": "2026-11-10", "depart": "12:00", "arrive": "14:30", "price": 1190, "duration_min": 150, "status": "准点"},
+  {"flight_no": "MG211", "airline": "芒果航空", "from_city": "广州", "to_city": "上海", "date": "2026-11-10", "depart": "16:45", "arrive": "19:10", "price": 1210, "duration_min": 145, "status": "准点"},
+  {"flight_no": "MG309", "airline": "芒果航空", "from_city": "成都", "to_city": "三亚", "date": "2026-11-10", "depart": "08:50", "arrive": "11:30", "price": 1390, "duration_min": 160, "status": "准点"},
+  {"flight_no": "MG311", "airline": "芒果航空", "from_city": "三亚", "to_city": "成都", "date": "2026-11-10", "depart": "15:00", "arrive": "17:40", "price": 1420, "duration_min": 160, "status": "准点"},
+  {"flight_no": "MG509", "airline": "芒果航空", "from_city": "西安", "to_city": "北京", "date": "2026-11-10", "depart": "09:20", "arrive": "11:25", "price": 990, "duration_min": 125, "status": "准点"},
+  {"flight_no": "MG603", "airline": "芒果航空", "from_city": "北京", "to_city": "昆明", "date": "2026-11-10", "depart": "13:30", "arrive": "16:45", "price": 1340, "duration_min": 195, "status": "准点"},
+  {"flight_no": "MG105", "airline": "芒果航空", "from_city": "北京", "to_city": "上海", "date": "2026-11-11", "depart": "09:00", "arrive": "11:25", "price": 990, "duration_min": 145, "status": "准点"},
+  {"flight_no": "MG207", "airline": "芒果航空", "from_city": "上海", "to_city": "广州", "date": "2026-11-11", "depart": "13:30", "arrive": "16:00", "price": 1200, "duration_min": 150, "status": "准点"},
+  {"flight_no": "MG405", "airline": "芒果航空", "from_city": "成都", "to_city": "昆明", "date": "2026-11-11", "depart": "08:20", "arrive": "10:05", "price": 700, "duration_min": 105, "status": "准点"},
+  {"flight_no": "MG511", "airline": "芒果航空", "from_city": "西安", "to_city": "杭州", "date": "2026-11-11", "depart": "15:00", "arrive": "17:10", "price": 960, "duration_min": 130, "status": "准点"}
+]
