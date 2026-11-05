@@ -6591,25 +6591,17 @@ Games.register({
 
   function callAI(text) {
     var cfg = state.cfg;
-    if (!cfg.endpoint || !cfg.apiKey) return Promise.reject(new Error('未配置 AI 客服端点或 Key'));
-    var url = cfg.endpoint.replace(/\/+$/, '') + '/chat/completions';
+    if (!cfg.endpoint) return Promise.reject(new Error('未配置客服后端地址'));
+    var url = cfg.endpoint.replace(/\/+$/, '') + '/api/assistant/chat';
     var prior = state.history.slice(-6).filter(function (m) { return m.role === 'user' || m.role === 'bot'; })
       .map(function (m) { return { role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }; });
-    var body = {
-      model: cfg.model || 'doubao-seed-2-1-pro-260915',
-      messages: [{ role: 'system', content: systemPrompt() }].concat(prior, [{ role: 'user', content: text }]),
-      temperature: 0.3,
-      max_tokens: 400,
-      /* 豆包 Seed 2.x 默认开启深度思考，会消耗大量 reasoning tokens；
-       * 客服问答关闭思考，显著节省 Token（仍保留关闭失败时的兼容）。 */
-      extra_body: { thinking: { type: 'disabled' } },
-    };
+    var body = { message: text, history: prior, lang: lang() };
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, CHAT_TIMEOUT) : null;
     var t0 = Date.now();
     return fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal: controller ? controller.signal : undefined,
     }).then(function (res) {
@@ -6620,10 +6612,9 @@ Games.register({
       state.lastLatency = Date.now() - t0;
       state.lastOkAt = Date.now();
       state.lastError = null;
-      var msg = data && data.choices && data.choices[0] && data.choices[0].message;
-      var content = msg && (msg.content || msg.reasoning_content);
-      if (!content || !String(content).trim()) throw new Error('AI 返回内容为空');
-      return String(content).trim();
+      var reply = data && data.reply;
+      if (!reply || !String(reply).trim()) throw new Error('AI 返回内容为空');
+      return String(reply).trim();
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
       state.lastError = err && err.name === 'AbortError' ? '请求超时' : String((err && err.message) || err);
@@ -6808,7 +6799,7 @@ Games.register({
     // 本地知识库命中（数据库里相似的问题）→ 直接用本地回答，不调豆包，省 Token
     var hit = matchKB(text);
     // AI 仅作兜底：本地答不上来、且已配置 AI 通道时才调用
-    var useAI = !hit && !!(state.cfg.enabled && state.cfg.endpoint && state.cfg.apiKey);
+    var useAI = !hit && !!(state.cfg.enabled && state.cfg.endpoint);
     var aiP = useAI ? callAI(text).catch(function (err) {
       state.aiBroken = true;
       state.verified = false;
@@ -6848,7 +6839,7 @@ Games.register({
     refreshMode();
     /* 每次打开面板时若尚未验证连通，则静默复测：开通模型后无需刷新
      * 页面，打开客服即自动切到 AI 通道（max_tokens:1，极省）。 */
-    if (state.cfg.enabled && state.cfg.endpoint && state.cfg.apiKey && !state.verified) {
+    if (state.cfg.enabled && state.cfg.endpoint && !state.verified) {
       testConnection().then(function (r) { state.verified = r.ok; refreshMode(); });
     }
     setTimeout(function () { if (el.text) el.text.focus(); }, 120);
@@ -6911,20 +6902,13 @@ Games.register({
   }
   function testConnection() {
     var cfg = state.cfg;
-    if (!cfg.endpoint) return Promise.resolve({ ok: false, message: T('请先填写 AI 客服端点地址') });
-    if (!cfg.apiKey) return Promise.resolve({ ok: false, message: T('请先填写 API Key') });
-    var url = cfg.endpoint.replace(/\/+$/, '') + '/chat/completions';
+    if (!cfg.endpoint) return Promise.resolve({ ok: false, message: T('请先填写客服后端地址') });
+    var url = cfg.endpoint.replace(/\/+$/, '') + '/api/health';
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, TEST_TIMEOUT) : null;
     var t0 = Date.now();
     return fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-      body: JSON.stringify({
-        model: cfg.model || 'doubao-seed-2-1-pro-260915',
-        messages: [{ role: 'user', content: 'ping' }],
-        max_tokens: 1,
-      }),
+      method: 'GET',
       signal: controller ? controller.signal : undefined,
     }).then(function (res) {
       if (timer) clearTimeout(timer);
@@ -8570,12 +8554,9 @@ function pageSettings() {
           <div><div class="set-label">${t('官方客服 AI 通道')}</div><div class="set-sub">${t('默认豆包免费模型 doubao-seed-2-1-pro-260915，免费额度内零成本；未配置或连接失败时自动使用本地知识库客服，对话不中断。')}</div></div>
           ${csStatusBadge()}
         </div>
-        <label class="f-label" for="aiEndpoint">${t('AI 客服端点地址')}</label>
-        <input class="f-input" id="aiEndpoint" type="url" placeholder="${t('例如 https://ark.cn-beijing.volces.com/api/v3')}" value="${esc(csCfg.endpoint)}">
-        <label class="f-label" for="aiModel">${t('模型名称')}</label>
-        <input class="f-input" id="aiModel" type="text" placeholder="${t('例如 doubao-seed-2-1-pro-260915')}" value="${esc(csCfg.model)}">
-        <label class="f-label" for="aiKey">${t('API Key')}</label>
-        <input class="f-input" id="aiKey" type="password" placeholder="${t('以 Bearer 方式随请求发送')}" value="${esc(csCfg.apiKey)}">
+        <label class="f-label" for="aiEndpoint">${t('客服后端地址')}</label>
+        <input class="f-input" id="aiEndpoint" type="url" placeholder="${t('例如 https://mango-air-backend.onrender.com')}" value="${esc(csCfg.endpoint)}">
+        <div style="background:var(--glass);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink-faint);font-size:12.5px;line-height:1.8">${t('AI Key 存放在服务端，无需在此填写；填写后端地址并保存后，客服即走后端 API（未配置或后端不可用时自动本地兜底）。')}</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button class="btn btn-ghost btn-sm" id="aiTest">${t('测试客服连接')}</button>
           <button class="btn btn-mango btn-sm" id="aiSave">${t('保存并启用')}</button>
@@ -8647,13 +8628,13 @@ function pageSettings() {
     });
   };
   /* ---- 官方客服 AI 通道交互 ---- */
-  const csEp = $('#aiEndpoint'), csModel = $('#aiModel'), csKey = $('#aiKey');
+  const csEp = $('#aiEndpoint');
   const csTest = $('#aiTest'), csSave = $('#aiSave'), csRes = $('#aiTestResult');
   if (csTest) csTest.onclick = () => {
     if (typeof MangoService === 'undefined') return;
     csRes.textContent = t('正在测试连接…');
     csRes.style.color = 'var(--ink-dim)';
-    MangoService.setConfig({ endpoint: csEp.value.trim(), model: csModel.value.trim() || 'doubao-seed-2-1-pro-260915', apiKey: csKey.value.trim(), enabled: false });
+    MangoService.setConfig({ endpoint: csEp.value.trim(), enabled: false });
     MangoService.testConnection().then(r => {
       csRes.textContent = (r.ok ? '✓ ' : '✗ ') + r.message;
       csRes.style.color = r.ok ? 'var(--ok)' : 'var(--danger)';
@@ -8663,7 +8644,7 @@ function pageSettings() {
     if (typeof MangoService === 'undefined') return;
     const endpoint = csEp.value.trim();
     if (!endpoint) { toast(t('请先填写 AI 客服端点地址')); csEp.focus(); return; }
-    MangoService.setConfig({ endpoint, model: csModel.value.trim() || 'doubao-seed-2-1-pro-260915', apiKey: csKey.value.trim(), enabled: true });
+    MangoService.setConfig({ endpoint, enabled: true });
     toast(t('客服配置已保存，AI 通道已启用'));
     csRes.textContent = '';
     MangoService.testConnection().then(r => {

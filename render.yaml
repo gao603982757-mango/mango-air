@@ -1,0 +1,20 @@
+# Render.com 一键部署配置（免费层）
+# 方式一（最快）：浏览器打开 https://render.com/deploy?repo=https://github.com/gao603982757-mango/mango-air
+# 方式二：Render 控制台 New → Blueprint → 连接本 GitHub 仓库
+# 部署完成后会得到地址 https://mango-air-backend.onrender.com
+services:
+  - type: web
+    name: mango-air-backend
+    runtime: python
+    plan: free
+    region: ohio
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://gao603982757-mango.github.io
+      - key: DOUBAO_API_KEY
+        sync: false   # 部署后在 Render 环境变量里填你自己的豆包 Key（可选，不填则客服走本地兜底）
