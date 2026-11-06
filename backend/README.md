@@ -109,3 +109,13 @@ docker run -p 8000:8000 --env-file ./backend/.env mango-air-backend
 ```
 
 **Render / Railway**：连此仓库，Build Command `pip install -r requirements.txt`，Start Command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`，并在平台环境变量里配置 `DOUBAO_API_KEY`。
+
+**Vercel（推荐，免费层无需绑卡）**：Vercel 新版 Python Runtime 支持 FastAPI 零配置部署——自动在 `main.py` / `app.py` / `index.py` / `app/main.py` 等入口里查找名为 `app` 的 FastAPI 实例，整个应用作为一个 Function 托管，`/api/*` 路径由 FastAPI 路由自行处理。本项目 `backend/main.py` 已导出 `app`，因此：
+
+1. 打开 `vercel.com/new` → Import 本 GitHub 仓库
+2. **Root Directory** 设为 `backend`，Framework Preset 选 **FastAPI**，其余默认
+3. 点 **Deploy**，得到 `https://<项目名>.vercel.app`
+4. （可选）在项目 Settings → Environment Variables 添加 `DOUBAO_API_KEY` 启用在线 AI；不填则客服自动走本地兜底
+5. 前端网站「设置 → 官方客服 → 客服后端地址」填入该 Vercel 地址即可接通
+
+> 无需 `vercel.json`、无需 Mangum、无需手写 rewrites。`backend/.python-version` 已锁定 Python 3.12。
